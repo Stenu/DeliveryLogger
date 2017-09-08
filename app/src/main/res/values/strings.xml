@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Lähetysten kuvaaja</string>
+    <string name="photo_delivery">KUVAA LÄHETYS</string>
+    <string name="look_deliveries">KATSO KUVIA</string>
+    <string name="delivery">Lähetys</string>
+    <string name="delivery_position">Pos.</string>
+    <string name="shoot">KUVAA</string>
+
+</resources>
