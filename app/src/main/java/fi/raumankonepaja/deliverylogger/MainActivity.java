@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** Called when the user taps the "photo delivery" - button */
     public void shootDelivery(View view) {
-        Intent intent = new Intent(this, GetDeliveryNumber.class);
+        Intent intent = new Intent(this, TakePhotoFromDelivery.class);
 
 
         startActivity(intent);

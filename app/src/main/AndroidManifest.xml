@@ -15,8 +15,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GetDeliveryNumber" />
-        <activity android:name=".TakePictureActivity"></activity>
+        <activity android:name=".TakePhotoFromDelivery" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="fi.raumankonepaja.deliverylogger.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+
+
+
     </application>
+
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+
 
 </manifest>
