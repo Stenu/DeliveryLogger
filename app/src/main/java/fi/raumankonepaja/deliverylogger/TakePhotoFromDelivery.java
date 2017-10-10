@@ -22,46 +22,63 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+// todo 1 Find out why files are not stored locally anymore.
+// (they dont need to be stored locally.... but why they are not saved??)
+
 
 public class TakePhotoFromDelivery extends AppCompatActivity {
 
     private static final String TAG = "TakePhotoFromDelivery";
     private static final String KEY_M_CURRENT_PHOTO_PATH = "mCurrentPhotoPath";
     private static final String KEY_M_LAST_CURRENT_PHOTO_PATH = "mLastCurrentPhotoPath";
-    private boolean pictureSent;
 
-    Uri photoURI;
+    // introduce class variables
+    Uri mPhotoURI;
     String mCurrentPhotoPath;
     String mLastCurrentPhotoPath;
 
-    EditText deliveryNumber;
-    EditText deliveryPosition;
-    Button shootButton;
-    ImageView takenPictureImageView;
+    EditText mDeliveryNumber;
+    EditText mDeliveryPosition;
+    Button mTakePictureButton;
+    ImageView mTakenPictureImageView;
+
+    UploadTask mUploadTask; // firebase upload task (storage)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_photo_from_delivery);
 
-        deliveryNumber = (EditText) findViewById(R.id.editTextDeliveryNumber);
-        deliveryPosition = (EditText) findViewById(R.id.editTextDeliveryPosition);
-        shootButton = (Button) findViewById(R.id.shootButton);
-        takenPictureImageView = (ImageView) findViewById(R.id.takenPictureImageView);
+        // set class variables
+        mDeliveryNumber = (EditText) findViewById(R.id.editTextDeliveryNumber);
+        mDeliveryPosition = (EditText) findViewById(R.id.editTextDeliveryPosition);
+        mTakePictureButton = (Button) findViewById(R.id.shootButton);
+        mTakenPictureImageView = (ImageView) findViewById(R.id.takenPictureImageView);
 
-        pictureSent = false;
+        mLastCurrentPhotoPath = null;
 
 
         TextChangeListener textChangeListener = new TextChangeListener();
 
-
-        // piilotetaan heti ekaksi  nappula
+        // hide mTakePictureButton  until the necessary information is provided
         showHideButton();
 
-        deliveryNumber.addTextChangedListener(textChangeListener);
-        deliveryPosition.addTextChangedListener(textChangeListener);
+        //hide mTakenPictureImageView because the photo is not taken
+        mTakenPictureImageView.setVisibility(View.INVISIBLE);
 
-        // ei hukkaa kuvaa orientaatiota vaihdettaessa
+        mDeliveryNumber.addTextChangedListener(textChangeListener);
+        mDeliveryPosition.addTextChangedListener(textChangeListener);
+
+        // don't lose data on orientation change
         if (savedInstanceState != null) {
             mCurrentPhotoPath = savedInstanceState.getString(KEY_M_CURRENT_PHOTO_PATH);
             mLastCurrentPhotoPath = savedInstanceState.getString(KEY_M_LAST_CURRENT_PHOTO_PATH);
@@ -74,43 +91,53 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // tarvittaessa upataan tiedot firebaseen
-        if(mCurrentPhotoPath != null){
-            File photoFile = new File (mCurrentPhotoPath);
+        // *** print log message
+        Log.i(TAG, " onResume() - metodissa");
+
+
+        // check if there is photo taken
+        if (mCurrentPhotoPath != null) {
+
+            // create file to memory
+            File photoFile = new File(mCurrentPhotoPath);
+
+            // *** print log message
             Log.i(TAG, "onResume metodissa katsomassa onko kuva vaihtunut");
             Log.i(TAG, "tiedoston koko:" + Long.toString(photoFile.length()));
 
-            if(photoFile.length() != 0 && mCurrentPhotoPath != mLastCurrentPhotoPath ){
+
+            // if there is data in photo file and data is not old
+            if (photoFile.length() != 0 && !mCurrentPhotoPath.equals(mLastCurrentPhotoPath)) {
+
+                // *** print log message
+                Log.i(TAG, "kutsutaan upload to firebase");
+                Log.i(TAG, "mCurrentPhotoPath     =" + mCurrentPhotoPath.toString());
+                if (mLastCurrentPhotoPath != null) {
+                    Log.i(TAG, "mLastCurrentPhotoPath =" + mLastCurrentPhotoPath.toString());
+                }
+
+
+                // tell that data is old
                 mLastCurrentPhotoPath = mCurrentPhotoPath;
 
+                // call upload method
                 uploadDataToFirebase();
             }
 
-            // jos on palattu kuvaus intentistä ilman kuvaa niin ei hukata viimeistä otettua kuvaa
-            if(photoFile.length() == 0){
+            // don't lose photo if returned from "take photo" -intent without photo
+            if (photoFile.length() == 0) {
                 mCurrentPhotoPath = mLastCurrentPhotoPath;
             }
 
-        }
-
-
-
-
-        // vaihdetaan kuva samalla imgavieviin
-        Log.d(TAG, " onResume() - metodissa");
-
-        if (mCurrentPhotoPath != null) {
-
-            takenPictureImageView.setVisibility(View.VISIBLE);
-
+            // put photo to mTakenPictureImageView
+            mTakenPictureImageView.setVisibility(View.VISIBLE);
             Bitmap takenPictureImage = (BitmapFactory.decodeFile(mCurrentPhotoPath));
-            takenPictureImageView.setImageBitmap(takenPictureImage);
+            mTakenPictureImageView.setImageBitmap(takenPictureImage);
 
-            // katsotaan missä asennossa kuva on otettu ja käännetään
-            // imageview oikeaan asentoon
-
+            // *** match orientation of photo and imageview
             try {
-                Log.i(TAG, " ExifInterface kohdassa");
+                // print to console
+                Log.i(TAG, " ExifInterface");
 
                 ExifInterface exif = new ExifInterface(mCurrentPhotoPath.toString());
 
@@ -125,16 +152,19 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
                     rotation = 270;
                 }
 
-                takenPictureImageView.setRotation(rotation);
+                mTakenPictureImageView.setRotation(rotation);
 
             } catch (Exception e) {
-                Log.e(TAG, "exifInterface lataus ei onnistunut");
+                // print to console
+                Log.e(TAG, "exifInterface failed");
                 Log.e(TAG, e.toString());
-                Log.e(TAG, "mCurrentPhotoPath :" + mCurrentPhotoPath.toString());
+                if (mLastCurrentPhotoPath != null) {
+                    Log.e(TAG, "mCurrentPhotoPath :" + mCurrentPhotoPath.toString());
+                }
             }
 
-
         }
+
 
     }
 
@@ -142,13 +172,16 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Log.i(TAG, "onSaveInstanceState - metodissa");
+        // print console
+        Log.i(TAG, "on onSaveInstanceState -methdod");
 
+        // save information during activity lifecycle
         outState.putString(KEY_M_CURRENT_PHOTO_PATH, mCurrentPhotoPath);
+        outState.putString(KEY_M_LAST_CURRENT_PHOTO_PATH, mLastCurrentPhotoPath);
 
     }
 
-    // tekstin muuttuja kuuntelija
+    // text change listener class for hiding mTakePictureButton
     private class TextChangeListener implements TextWatcher {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -167,22 +200,23 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     }
 
 
-    // metodi joka piilottaa kuvaa napin jos tietoja ei ole tarpeeksi
+    // hides/shows mTakePictureButton
     private void showHideButton() {
 
 
-        if (deliveryNumber.getText().length() > 0 && deliveryPosition.getText().length() > 0) {
-            shootButton.setVisibility(View.VISIBLE);
-            Log.i(TAG, "showHideButton metodi: näytä nappi");
+        if (mDeliveryNumber.getText().length() > 0 && mDeliveryPosition.getText().length() > 0) {
+            mTakePictureButton.setVisibility(View.VISIBLE);
+            Log.i(TAG, "show Take Picture button");
         } else {
-            shootButton.setVisibility(View.INVISIBLE);
+            mTakePictureButton.setVisibility(View.INVISIBLE);
+            Log.i(TAG, "hide Take Picture button");
         }
 
 
     }
 
 
-    // tämä metodi laukaisee intentin, jossa kamera-apilla otetaan kuva
+    // this method launches androids camera intent
     static final int REQUEST_TAKE_PHOTO = 1;
 
     public void takePicture(View view) {
@@ -201,10 +235,10 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 //    Uri photoURI = FileProvider.getUriForFile(this,
-                photoURI = FileProvider.getUriForFile(this,
+                mPhotoURI = FileProvider.getUriForFile(this,
                         "fi.raumankonepaja.deliverylogger.fileprovider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
 
 
@@ -213,12 +247,14 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     }
 
 
-    // tässä luodaan uusi tiedosto, johon kuva sitten tallennetaan...
+    // this method creates and returns new imagefile
     private File createImageFile() throws IOException {
         // Create an image file name
-        // String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        // String imageFileName = "JPEG_" + timeStamp + "_";
-        String imageFileName = "JPEG_" + "kuva1";
+        String imageFileName = "JPEG_" + "IMG_";
+
+        //print to console
+        Log.i(TAG, "pictures directory is: " + Environment.DIRECTORY_PICTURES.toString());
+
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -231,10 +267,42 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         return image;
     }
 
-    private void uploadDataToFirebase (){
+    // this method uploads data to firebase
+    private void uploadDataToFirebase() {
 
-        Toast toast = Toast.makeText(this," FIREBASE lähetys", Toast.LENGTH_SHORT);
+        int deliveryInt = Integer.parseInt(mDeliveryNumber.getText().toString());
+        int positionInt = Integer.parseInt(mDeliveryPosition.getText().toString());
+
+        String pictureFileName = mPhotoURI.getLastPathSegment();
+
+        // get photo time
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+
+        // show toast
+        Toast toast = Toast.makeText(this, "Siirretään tiedot\n" +
+                "lähetyslista:" + Integer.toString(deliveryInt) +
+                " \npositio:" + Integer.toString(positionInt), Toast.LENGTH_SHORT);
         toast.show();
+
+
+        // firebase database upload (data)
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        LogEntry logEntry = new LogEntry(deliveryInt, positionInt, pictureFileName, currentDateandTime);
+        databaseReference.push().setValue(logEntry);
+
+        // firebase storage upload (photo - jpg)
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        StorageReference storageRef = storage.getReference();
+
+        //create reference to images folder and assing a name to the file that will be uploaded
+        StorageReference imageRef = storageRef.child("/images/" + pictureFileName);
+
+        if (mPhotoURI != null) {
+            mUploadTask = imageRef.putFile(mPhotoURI);
+        }
+
 
     }
 
