@@ -5,5 +5,7 @@
     <string name="delivery">Lähetys</string>
     <string name="delivery_position">Pos.</string>
     <string name="shoot">KUVAA</string>
+    <string name="search_target_button">ETSI</string>
+
 
 </resources>

@@ -17,5 +17,19 @@ public class LogEntry {
         this.dateAndTime = dateAndTime;
     }
 
+    public int getDeliveryNumber() {
+        return deliveryNumber;
+    }
 
+    public int getDeliveryPos() {
+        return deliveryPos;
+    }
+
+    public String getPictureFileName() {
+        return pictureFileName;
+    }
+
+    public String getDateAndTime() {
+        return dateAndTime;
+    }
 }

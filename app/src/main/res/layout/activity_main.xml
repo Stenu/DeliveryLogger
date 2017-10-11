@@ -52,7 +52,8 @@
             android:layout_gravity="right"
             android:background="#d6ef69"
             android:textSize="30dp"
-            android:text="@string/look_deliveries" />
+            android:text="@string/look_deliveries"
+            android:onClick="listDeliveries"/>
 
     </LinearLayout>
 

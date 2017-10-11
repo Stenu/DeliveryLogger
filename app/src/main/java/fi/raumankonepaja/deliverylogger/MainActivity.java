@@ -33,6 +33,17 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Called when the user taps the "list deliveries" - button
+     */
+    public void listDeliveries(View view) {
+        Intent intent = new Intent(this, ListDeliveriesActivity.class);
+
+
+        startActivity(intent);
+    }
+
+
 
     @Override
     protected void onDestroy() {

@@ -234,7 +234,7 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                //    Uri photoURI = FileProvider.getUriForFile(this,
+
                 mPhotoURI = FileProvider.getUriForFile(this,
                         "fi.raumankonepaja.deliverylogger.fileprovider",
                         photoFile);
