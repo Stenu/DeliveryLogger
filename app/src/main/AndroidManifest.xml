@@ -31,7 +31,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".ListDeliveriesActivity"></activity>
+        <activity android:name=".ListDeliveriesActivity" />
+        <activity android:name=".ShowPhotosOfDelivery"></activity>
     </application>
 
 </manifest>

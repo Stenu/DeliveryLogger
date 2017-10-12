@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="18dp"
@@ -13,12 +14,21 @@
         android:layout_weight="60"
         >
 
-    <TextView
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_launcher"
+            android:id="@+id/PhotoOnListImageView"
+            android:scaleType="centerInside"
+            android:adjustViewBounds="true"
+            android:layout_weight="70" />
 
+        <TextView
+        android:id="@+id/positionTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="70"
-        android:text="lähetenumero: "
+        android:text="positio : "
         android:textSize="14dp"
         android:layout_gravity="center"
         android:textAlignment="center"
@@ -26,12 +36,12 @@
        />
 
     <TextView
-        android:id="@+id/textViewDeliveryNumber"
+        android:id="@+id/dateAndTimeTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="70"
-        android:text=" "
-        android:textSize="20dp"
+        android:text="datwNtime"
+        android:textSize="14dp"
         android:layout_gravity="center"
         android:textAlignment="center"
         android:textStyle="bold"
@@ -39,16 +49,7 @@
 
     </LinearLayout>
 
-    <Button
-        android:text="HAE KUVAT"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/showPicturesButton"
-        android:layout_weight="50"
-        android:layout_gravity="center"
-        android:background="#d6ef69"
 
-        />
 
 
 </LinearLayout>
