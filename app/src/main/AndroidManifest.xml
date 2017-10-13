@@ -32,7 +32,8 @@
         </provider>
 
         <activity android:name=".ListDeliveriesActivity" />
-        <activity android:name=".ShowPhotosOfDelivery"></activity>
+        <activity android:name=".ShowPhotosOfDelivery" />
+        <activity android:name=".ShowOnePhotoActivity"></activity>
     </application>
 
 </manifest>

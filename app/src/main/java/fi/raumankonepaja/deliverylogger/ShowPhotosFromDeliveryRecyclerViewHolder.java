@@ -33,7 +33,8 @@ public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewH
     public ImageView mPhotoOnListImageView;
 
 
-    private List<ListItem> mListItems;
+   // private List<ListItem> mListItems;
+
     public ShowPhotosFromDeliveryRecyclerViewHolder  (final View itemView, final List<PhotoListItem> mPhotoListItems) {
 
         super(itemView);
@@ -42,6 +43,29 @@ public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewH
         mPositionTextView = (TextView) itemView.findViewById(R.id.positionTextView);
         mDateAndTimeTextView = (TextView) itemView.findViewById(R.id.dateAndTimeTextView);
         mPhotoOnListImageView = (ImageView) itemView.findViewById(R.id.PhotoOnListImageView);
+
+        mPhotoOnListImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int mDeliveryNumber = mPhotoListItems.get(getAdapterPosition()).getDeliveryNumber();
+                int mPosition = mPhotoListItems.get(getAdapterPosition()).getDeliveryPos();
+                String mPictureFileName = mPhotoListItems.get(getAdapterPosition()).getPictureFileName();
+
+                //      Toast.makeText(v.getContext(), "HAE LÄHETE :"+Integer.toString(mDeliveryNumber), Toast.LENGTH_LONG).show();
+
+
+
+
+                Intent intent = new Intent(v.getContext(),ShowOnePhotoActivity.class);
+                intent.putExtra("EXTRA_DELIVERY_NUMBER", mDeliveryNumber);
+                intent.putExtra("EXTRA_DELIVERY_POSITION", mPosition);
+                intent.putExtra("EXTRA_PICTURE_FILE_NAME", mPictureFileName);
+                v.getContext().startActivity(intent);
+
+
+            }
+        });
 
 
     }

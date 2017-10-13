@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -267,7 +269,7 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         return image;
     }
 
-    // this method uploads data to firebase
+    // this method uploads data to firebase (works but must be improved...)
     private void uploadDataToFirebase() {
 
         int deliveryInt = Integer.parseInt(mDeliveryNumber.getText().toString());
@@ -302,6 +304,26 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         if (mPhotoURI != null) {
             mUploadTask = imageRef.putFile(mPhotoURI);
         }
+
+        //now we make thumbnail from picture
+        //we are decoding bitmap for 2nd time... improve code here
+        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mCurrentPhotoPath),640,640);
+
+        //create reference to images folder and assing a name to the file that will be uploaded
+        imageRef = storageRef.child("/images/thumbnail_" + pictureFileName);
+
+        // prepare thumbail to be send
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] thumbnailData = baos.toByteArray();
+
+        mUploadTask = imageRef.putBytes(thumbnailData);
+
+
+
+
+
+
 
 
     }

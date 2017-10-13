@@ -11,6 +11,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 
+import static android.os.Environment.DIRECTORY_PICTURES;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,14 +52,20 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
 
-//        try {
-//            if (getExternalFilesDir(Environment.DIRECTORY_PICTURES) != null) {
-//                Log.i(TAG, "Deleting files");
-//                FileUtils.cleanDirectory(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-//            }
-//        } catch (Exception e) {
+     try {
+
+         // todo 1 delete photos from phone after app is closed
+//           if (getExternalFilesDir(DIRECTORY_PICTURES) != null) {
+//               Log.i(TAG, "Deleting files!:  "+ getFilesDir() +"/"+Environment.DIRECTORY_PICTURES);
+//          //     FileUtils.cleanDirectory(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+//               FileUtils.deleteDirectory(new File(getFilesDir() +"/"+Environment.DIRECTORY_PICTURES));
+//          //     getFilesDir().deleteOnExit();
 //
-//        }
+//           }
+
+
+       } catch (Exception e) {
+     }
 
 
     }

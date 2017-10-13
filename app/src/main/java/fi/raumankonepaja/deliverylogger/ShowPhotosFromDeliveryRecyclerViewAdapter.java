@@ -5,6 +5,7 @@ package fi.raumankonepaja.deliverylogger;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -66,8 +67,8 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReference();
 
-        // Create a reference with an initial file path and name
-        StorageReference photoPathReference = storageRef.child("images/"+mPhotoListItems.get(position).getPictureFileName());
+        // Create a reference with an initial (thumbnail)file path and name
+        StorageReference photoPathReference = storageRef.child("images/thumbnail_"+mPhotoListItems.get(position).getPictureFileName());
 
        final long ONE_MEGABYTE = 1024 * 1024;
 
@@ -85,6 +86,8 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
                 // Handle any errors
             }
         });
+
+
 
 
 
