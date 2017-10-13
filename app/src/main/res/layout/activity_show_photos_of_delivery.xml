@@ -8,14 +8,16 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+
     android:orientation="vertical"
     tools:context="fi.raumankonepaja.deliverylogger.ShowPhotosOfDelivery"
     >
 
-    <LinearLayout
-        android:layout_width="354dp"
-        android:layout_height="39dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
         android:orientation="horizontal">
 
     <TextView
@@ -24,17 +26,26 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="20dp"
-        android:id="@+id/showPhotosFromDeliveryTitleTextView" />
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/showPhotosFromDeliveryTitleTextView"
+        android:textColor="@color/colorAccent"
+        />
 
-        <ImageButton
+        <Button
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/sym_action_email"
+            android:text="LÄHETÄ KUVAT \n   SÄHKÖPOSTILLA   "
+            android:background="@color/colorTriadig1"
             android:id="@+id/emailButton"
             android:onClick="sendEmail"
+            android:layout_gravity="right"
+
             />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/photo_list"

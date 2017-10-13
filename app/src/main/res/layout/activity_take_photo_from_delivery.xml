@@ -81,7 +81,7 @@
             android:layout_height="50dp"
             android:text="@string/shoot"
             android:onClick="takePicture"
-            android:background="#40dff9"
+            android:background="@color/colorTriadig1"
             android:id="@+id/shootButton"
             />
 

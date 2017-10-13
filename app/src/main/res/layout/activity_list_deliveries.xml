@@ -15,11 +15,12 @@
         android:orientation="vertical">
 
         <TextView
-            android:text="LÄHETTEIDEN LISTA"
+            android:text="@string/deliveries"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:id="@+id/textView3" />
+            android:textSize="16dp"
+            android:textAlignment="center"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/log_entries_list"

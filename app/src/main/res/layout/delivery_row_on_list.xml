@@ -4,51 +4,77 @@
     android:layout_height="wrap_content"
     android:paddingTop="18dp"
     android:paddingBottom="18dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    >
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="60"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:background="@color/colorPrimaryLight"
         >
 
-    <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="60"
+            android:background="@color/colorPrimaryLight"
+            android:orientation="horizontal"
+            android:paddingBottom="18dp"
+            android:paddingTop="18dp">
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="70"
-        android:text="lähetenumero: "
-        android:textSize="14dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="60"
+            >
 
-       />
+        <TextView
 
-    <TextView
-        android:id="@+id/textViewDeliveryNumber"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="70"
-        android:text=" "
-        android:textSize="20dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:text="@string/delivery_list_name"
+            android:textSize="16dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
 
+           />
+
+        <TextView
+            android:id="@+id/textViewDeliveryNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            android:text=" "
+            android:textSize="20dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            />
+
+        </LinearLayout>
+
+        <Button
+            android:text="@string/search_photos_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/showPicturesButton"
+            android:layout_weight="50"
+            android:layout_gravity="center"
+            android:background="@color/colorTriadig1"
+
+
+            />
+
+            </LinearLayout>
     </LinearLayout>
-
-    <Button
-        android:text="HAE KUVAT"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/showPicturesButton"
-        android:layout_weight="50"
-        android:layout_gravity="center"
-        android:background="#d6ef69"
-
-        />
 
 
 </LinearLayout>

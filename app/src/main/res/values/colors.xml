@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#157bf0</color>
+    <color name="colorPrimaryDark">#0d63c5</color>
+    <color name="colorPrimaryLight">#5da4f5</color>
+
+    <color name="colorTriadig1">#7bf015</color>
+    <color name="colorTriadig2">#f0157b</color>
+
+    <color name="colorAnalogous1">#1d15f0</color>
+    <color name="colorAnalogous2">#15e9f0</color>
+
+    <color name="colorComplementary">#f08a15</color>
+
+    <color name="colorAccent">#000000</color>
+
+    <color name="colorWhite">#FFFFFF</color>
 </resources>

@@ -49,7 +49,7 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
        //print log
         Log.i(TAG, "Binding holder type 2------");
 
-        holder.mPositionTextView.setText("Pos: "+Integer.toString(mPhotoListItems.get(position).deliveryPos));
+
 
         // muokataan päivämäärän esitysjutut kuntoon
         String dateAndTime = mPhotoListItems.get(position).getDateAndTime();
@@ -58,7 +58,10 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
         String year = dateAndTime.substring(0,4);
         String hour = dateAndTime.substring(9,11);
         String minut = dateAndTime.substring(11,13);
-        holder.mDateAndTimeTextView.setText(date+"."+month+"."+year+" "+hour+":"+minut);
+
+       String dateString = (date+"."+month+"."+year+" "+hour+":"+minut);
+
+        holder.mPhotoInfo.setText("Pos: "+Integer.toString(mPhotoListItems.get(position).deliveryPos)+" " + dateString);
 
 
         // tässä pitää hakea kuva firebasesta??

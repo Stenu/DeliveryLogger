@@ -3,53 +3,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="18dp"
+    android:orientation="horizontal"
     android:paddingBottom="18dp"
-    android:orientation="horizontal">
+    android:paddingTop="18dp"
+
+    >
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:layout_weight="60"
-        >
+        android:background="@color/colorPrimaryLight"
+        android:orientation="vertical"
+        android:paddingBottom="18dp"
+        android:paddingTop="18dp">
 
         <ImageView
+
+
+            android:id="@+id/PhotoOnListImageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_popup_sync"
-            android:id="@+id/PhotoOnListImageView"
+            android:layout_weight="70"
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+
             android:scaleType="centerInside"
-            android:adjustViewBounds="true"
-            android:layout_weight="70" />
+            app:srcCompat="@android:drawable/ic_popup_sync"
+
+            />
+
 
         <TextView
-        android:id="@+id/positionTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="70"
-        android:text="positio : "
-        android:textSize="14dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"
 
-       />
+            android:id="@+id/photoInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="70"
+            android:text="pos x dd.mm.yyyy hh:mm"
+            android:textAlignment="center"
+            android:textSize="16dp"
+            android:textColor="@color/colorAccent"
 
-    <TextView
-        android:id="@+id/dateAndTimeTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="70"
-        android:text="datwNtime"
-        android:textSize="14dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        />
+            />
+
 
     </LinearLayout>
-
-
 
 
 </LinearLayout>

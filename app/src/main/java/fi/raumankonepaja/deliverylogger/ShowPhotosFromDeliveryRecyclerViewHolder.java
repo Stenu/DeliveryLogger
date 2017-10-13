@@ -28,8 +28,7 @@ public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewH
 
     private List<PhotoListItem> mPhotoListItems;
 
-    public TextView mPositionTextView;
-    public TextView mDateAndTimeTextView;
+    public TextView mPhotoInfo;
     public ImageView mPhotoOnListImageView;
 
 
@@ -40,8 +39,7 @@ public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewH
         super(itemView);
         this.mPhotoListItems = mPhotoListItems;
 
-        mPositionTextView = (TextView) itemView.findViewById(R.id.positionTextView);
-        mDateAndTimeTextView = (TextView) itemView.findViewById(R.id.dateAndTimeTextView);
+        mPhotoInfo = (TextView) itemView.findViewById(R.id.photoInfo);
         mPhotoOnListImageView = (ImageView) itemView.findViewById(R.id.PhotoOnListImageView);
 
         mPhotoOnListImageView.setOnClickListener(new View.OnClickListener() {
