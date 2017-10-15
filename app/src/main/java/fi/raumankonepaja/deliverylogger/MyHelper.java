@@ -1,9 +1,6 @@
 package fi.raumankonepaja.deliverylogger;
 
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -13,12 +10,9 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import com.drew.metadata.jpeg.JpegDirectory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Sami on 15.10.2017.

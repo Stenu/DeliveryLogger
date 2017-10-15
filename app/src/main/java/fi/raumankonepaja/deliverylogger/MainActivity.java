@@ -1,32 +1,36 @@
 package fi.raumankonepaja.deliverylogger;
 
 import android.content.Intent;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
-
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-
-import static android.os.Environment.DIRECTORY_PICTURES;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-   
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+
+
+    }
 
     /**
      * Called when the user taps the "photo delivery" - button
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
 
+
+
      try {
 
          // todo 1 delete photos from phone after app is closed
@@ -71,4 +77,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
+
+
+
+
 }
