@@ -5,7 +5,6 @@ package fi.raumankonepaja.deliverylogger;
  */
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -15,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.drew.metadata.Metadata;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,7 +38,6 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
     public ShowPhotosFromDeliveryRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
        ShowPhotosFromDeliveryRecyclerViewHolder viewHolder = null;
 
-        // tämä pitää selvittää
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.show_photos_from_delivery_row, parent, false);
         viewHolder = new ShowPhotosFromDeliveryRecyclerViewHolder(layoutView, mPhotoListItems);
         return viewHolder;
@@ -51,7 +50,7 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
 
 
 
-        // muokataan päivämäärän esitysjutut kuntoon
+        // get and modify date and time data
         String dateAndTime = mPhotoListItems.get(position).getDateAndTime();
         String date = dateAndTime.substring(6,8);
         String month = dateAndTime.substring(4,6);
@@ -64,7 +63,7 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
         holder.mPhotoInfo.setText("Pos: "+Integer.toString(mPhotoListItems.get(position).deliveryPos)+" " + dateString);
 
 
-        // tässä pitää hakea kuva firebasesta??
+        // -- get photo from firebase storage
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         // Create a storage reference from our app
@@ -73,14 +72,19 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
         // Create a reference with an initial (thumbnail)file path and name
         StorageReference photoPathReference = storageRef.child("images/thumbnail_"+mPhotoListItems.get(position).getPictureFileName());
 
+
        final long ONE_MEGABYTE = 1024 * 1024;
 
         photoPathReference.getBytes(10*ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
-                // Data for "images/island.jpg" is returns, use this as needed
+
+                // After photo is downloaded -> put it to imageview on row
+                // todo 1 rotate image/view to correct position...
+                MyHelper.matcViewToPhotoOrientation(holder.mPhotoOnListImageView,bytes);
                 Bitmap photo = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
                 holder.mPhotoOnListImageView.setImageBitmap(photo);
+
 
             }
         }).addOnFailureListener(new OnFailureListener() {

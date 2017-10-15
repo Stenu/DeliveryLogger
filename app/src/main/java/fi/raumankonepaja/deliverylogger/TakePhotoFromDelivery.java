@@ -6,11 +6,11 @@ import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,18 +20,23 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 // todo 1 Find out why files are not stored locally anymore.
 // (they dont need to be stored locally.... but why they are not saved??)
@@ -48,12 +53,18 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     String mCurrentPhotoPath;
     String mLastCurrentPhotoPath;
 
+    // introduce variables from layout components
     EditText mDeliveryNumber;
     EditText mDeliveryPosition;
     Button mTakePictureButton;
+    Button mShowPhotosButton;
     ImageView mTakenPictureImageView;
 
     UploadTask mUploadTask; // firebase upload task (storage)
+    List<ListItem> mListItems;
+    List<String> avaimet;
+
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,19 +75,26 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         mDeliveryNumber = (EditText) findViewById(R.id.editTextDeliveryNumber);
         mDeliveryPosition = (EditText) findViewById(R.id.editTextDeliveryPosition);
         mTakePictureButton = (Button) findViewById(R.id.shootButton);
+        mShowPhotosButton = (Button) findViewById(R.id.showPhotosButton);
         mTakenPictureImageView = (ImageView) findViewById(R.id.takenPictureImageView);
 
         mLastCurrentPhotoPath = null;
 
+        // instantiate lists
+        mListItems = new ArrayList<>();
+        avaimet = new ArrayList<>();
 
-        TextChangeListener textChangeListener = new TextChangeListener();
+
 
         // hide mTakePictureButton  until the necessary information is provided
-        showHideButton();
+        showHideButton(); // checks that correct buttons are visible
 
         //hide mTakenPictureImageView because the photo is not taken
         mTakenPictureImageView.setVisibility(View.INVISIBLE);
 
+        // instantiate textChangeListener ...
+        TextChangeListener textChangeListener = new TextChangeListener();
+        // ... and put it on both editable textview
         mDeliveryNumber.addTextChangedListener(textChangeListener);
         mDeliveryPosition.addTextChangedListener(textChangeListener);
 
@@ -87,7 +105,38 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         }
 
 
+        // intialize firebase data connection
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                getAllDeliveries(dataSnapshot);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                getAllDeliveries(dataSnapshot);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+
     }
+
+
 
     @Override
     protected void onResume() {
@@ -96,6 +145,8 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         // *** print log message
         Log.i(TAG, " onResume() - metodissa");
 
+        // check that correct buttons are visible
+        showHideButton();
 
         // check if there is photo taken
         if (mCurrentPhotoPath != null) {
@@ -132,38 +183,15 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
             }
 
             // put photo to mTakenPictureImageView
+
             mTakenPictureImageView.setVisibility(View.VISIBLE);
             Bitmap takenPictureImage = (BitmapFactory.decodeFile(mCurrentPhotoPath));
             mTakenPictureImageView.setImageBitmap(takenPictureImage);
 
-            // *** match orientation of photo and imageview
-            try {
-                // print to console
-                Log.i(TAG, " ExifInterface");
+            // MyHelper - is a class that holds static methods that are needed on app..
+            // todo 2 get rotation and save it to custom metainformation to tuhmbail on uploadtofirebase method...
+            MyHelper.matchViewToPhotoOrientation(mTakenPictureImageView,mCurrentPhotoPath);
 
-                ExifInterface exif = new ExifInterface(mCurrentPhotoPath.toString());
-
-                int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                int rotation = 0;
-
-                if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-                    rotation = 90;
-                } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-                    rotation = 180;
-                } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-                    rotation = 270;
-                }
-
-                mTakenPictureImageView.setRotation(rotation);
-
-            } catch (Exception e) {
-                // print to console
-                Log.e(TAG, "exifInterface failed");
-                Log.e(TAG, e.toString());
-                if (mLastCurrentPhotoPath != null) {
-                    Log.e(TAG, "mCurrentPhotoPath :" + mCurrentPhotoPath.toString());
-                }
-            }
 
         }
 
@@ -202,21 +230,63 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     }
 
 
-    // hides/shows mTakePictureButton
+
+
+    // **** hides/shows mTakePictureButton
     private void showHideButton() {
 
+        // if deliverunumber is entered on layout ...
+        if (mDeliveryNumber.getText().length() > 0) {
 
-        if (mDeliveryNumber.getText().length() > 0 && mDeliveryPosition.getText().length() > 0) {
-            mTakePictureButton.setVisibility(View.VISIBLE);
-            Log.i(TAG, "show Take Picture button");
-        } else {
+            // ...and position is also entered -> show take picture button
+            if (mDeliveryPosition.getText().length() > 0) {
+                mTakePictureButton.setVisibility(View.VISIBLE);
+                Log.i(TAG, "show Take Picture button");
+                Log.i(TAG, " ");
+            } else {
+                //... and if position is not entered -> hide show picture button
+                mTakePictureButton.setVisibility(View.INVISIBLE);
+                Log.i(TAG, "hide Take Picture button");
+            }
+
+            // checks that if typed deliverynumber is exist on firebase database
+            int deliveryNumberAtTheMoment = Integer.parseInt(mDeliveryNumber.getText().toString());
+            if (hasDeliveryInformation(deliveryNumberAtTheMoment)) {
+
+                // if deliverynumber exists show show_photos_button
+                mShowPhotosButton.setVisibility(View.VISIBLE);
+            } else {
+                //// if deliverynumber is not exist hide show_photos_button
+                mShowPhotosButton.setVisibility(View.INVISIBLE);
+            }
+
+        } else { // no deliverynumber -> hide both buttons
+            mShowPhotosButton.setVisibility(View.INVISIBLE);
             mTakePictureButton.setVisibility(View.INVISIBLE);
             Log.i(TAG, "hide Take Picture button");
         }
-
-
     }
 
+
+    // this method creates and returns new imagefile
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String imageFileName = "JPEG_" + "IMG_";
+
+        //print to console
+        Log.i(TAG, "pictures directory is: " + Environment.DIRECTORY_PICTURES.toString());
+
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
 
     // this method launches androids camera intent
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -249,27 +319,10 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
     }
 
 
-    // this method creates and returns new imagefile
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String imageFileName = "JPEG_" + "IMG_";
 
-        //print to console
-        Log.i(TAG, "pictures directory is: " + Environment.DIRECTORY_PICTURES.toString());
 
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    // this method uploads data to firebase (works but must be improved...)
+    // this method uploads data to firebase (works but could be improved...)
     private void uploadDataToFirebase() {
 
         int deliveryInt = Integer.parseInt(mDeliveryNumber.getText().toString());
@@ -289,7 +342,7 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
 
         // firebase database upload (data)
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+
         LogEntry logEntry = new LogEntry(deliveryInt, positionInt, pictureFileName, currentDateandTime);
         databaseReference.push().setValue(logEntry);
 
@@ -307,7 +360,7 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
         //now we make thumbnail from picture
         //we are decoding bitmap for 2nd time... improve code here
-        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mCurrentPhotoPath),640,640);
+        Bitmap thumbnail = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mCurrentPhotoPath), 640, 640);
 
         //create reference to images folder and assing a name to the file that will be uploaded
         imageRef = storageRef.child("/images/thumbnail_" + pictureFileName);
@@ -320,13 +373,43 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         mUploadTask = imageRef.putBytes(thumbnailData);
 
 
-
-
-
-
-
-
     }
+
+
+
+    private void getAllDeliveries(DataSnapshot dataSnapshot) {
+
+        for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+
+            if (singleSnapshot.getKey().equals("deliveryNumber") && !avaimet.contains(singleSnapshot.getValue().toString())) {
+
+                mListItems.add(new ListItem(Integer.parseInt(singleSnapshot.getValue().toString())));
+                avaimet.add(singleSnapshot.getValue().toString());
+            }
+
+            Collections.reverse(mListItems);
+
+        }
+    }
+
+    // check that if the list contains information about deliverynumber
+    private boolean hasDeliveryInformation(int delNumber) {
+
+        for (ListItem item : mListItems) {
+            if (item.getDeliveryNumber() == delNumber) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void showPhotos(View view) {
+
+        Intent intent = new Intent(view.getContext(), ShowPhotosOfDelivery.class);
+        intent.putExtra("EXTRA_DELIVERY_NUMBER", Integer.parseInt(mDeliveryNumber.getText().toString()));
+        view.getContext().startActivity(intent);
+    }
+
 
 
 }

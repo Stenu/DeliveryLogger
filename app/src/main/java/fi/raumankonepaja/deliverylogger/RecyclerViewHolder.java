@@ -37,11 +37,6 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder{
 
                 int mDeliveryNumber = mListItems.get(getAdapterPosition()).getDeliveryNumber();
 
-                //      Toast.makeText(v.getContext(), "HAE LÄHETE :"+Integer.toString(mDeliveryNumber), Toast.LENGTH_LONG).show();
-
-
-
-
                 Intent intent = new Intent(v.getContext(),ShowPhotosOfDelivery.class);
                 intent.putExtra("EXTRA_DELIVERY_NUMBER", mDeliveryNumber);
                 v.getContext().startActivity(intent);

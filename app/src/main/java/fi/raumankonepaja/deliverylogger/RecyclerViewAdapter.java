@@ -27,7 +27,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewHolder
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerViewHolder viewHolder = null;
-        // tämä pitää selvittää
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.delivery_row_on_list, parent, false);
         viewHolder = new RecyclerViewHolder(layoutView, mListItems);
         return viewHolder;

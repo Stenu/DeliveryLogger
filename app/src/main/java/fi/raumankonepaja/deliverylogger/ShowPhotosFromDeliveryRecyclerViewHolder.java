@@ -4,22 +4,12 @@ package fi.raumankonepaja.deliverylogger;
  * Created by Sami on 11.10.2017.
  */
 
-import android.app.LauncherActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+
 import java.util.List;
 
 public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewHolder{
@@ -32,7 +22,6 @@ public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewH
     public ImageView mPhotoOnListImageView;
 
 
-   // private List<ListItem> mListItems;
 
     public ShowPhotosFromDeliveryRecyclerViewHolder  (final View itemView, final List<PhotoListItem> mPhotoListItems) {
 
@@ -46,13 +35,11 @@ public class ShowPhotosFromDeliveryRecyclerViewHolder extends RecyclerView.ViewH
             @Override
             public void onClick(View v) {
 
+                // this runs when user clicks thumbail of photo
+
                 int mDeliveryNumber = mPhotoListItems.get(getAdapterPosition()).getDeliveryNumber();
                 int mPosition = mPhotoListItems.get(getAdapterPosition()).getDeliveryPos();
                 String mPictureFileName = mPhotoListItems.get(getAdapterPosition()).getPictureFileName();
-
-                //      Toast.makeText(v.getContext(), "HAE LÄHETE :"+Integer.toString(mDeliveryNumber), Toast.LENGTH_LONG).show();
-
-
 
 
                 Intent intent = new Intent(v.getContext(),ShowOnePhotoActivity.class);

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -17,6 +19,7 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+   
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
 //          //     getFilesDir().deleteOnExit();
 //
 //           }
-
 
        } catch (Exception e) {
      }

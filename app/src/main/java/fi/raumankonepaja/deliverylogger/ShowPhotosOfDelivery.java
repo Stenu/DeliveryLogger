@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import static android.support.v4.content.FileProvider.getUriForFile;
 
 
@@ -47,7 +46,6 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
     private ArrayList<PhotoListItem> mPhotoListItems;
 
     int mDeliveryNumber;
-
 
 
     private Task<Void> allTask;
@@ -76,9 +74,9 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
 
-        // haetaan firebasesta tämän lähetyksen tiedot jonnekkin eka
-        // get firebase database reference
+        // -- get info from this delivery from firebase
 
+        // get firebase database reference
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
         databaseReference.orderByChild("deliveryNumber").equalTo(mDeliveryNumber).addChildEventListener(new ChildEventListener() {
@@ -87,11 +85,10 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
 
                 Log.i(TAG, dataSnapshot.getKey() + " -> " + dataSnapshot.getValue().toString());
 
-                //   int deliveryPos = dataSnapshot.getValue("deliveryPos");
+                // firebase returns our custom class PhotoListItem!
                 PhotoListItem photoListItem = dataSnapshot.getValue(PhotoListItem.class);
 
                 mPhotoListItems.add(photoListItem);
-
 
                 recyclerViewAdapter = new ShowPhotosFromDeliveryRecyclerViewAdapter(ShowPhotosOfDelivery.this, mPhotoListItems);
                 recyclerView.setAdapter(recyclerViewAdapter);
@@ -123,7 +120,9 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
 
     }
 
-    // method that runs when email button is clicked
+    // --- method that runs when email button is clicked
+    // Downloads photos asynchonized. So first photos are downloaded to device, and
+    // afterwards attached to email that is going to be sens.
     void sendEmail(View view) {
         Log.i(TAG, "Send email cliked!");
 
@@ -133,131 +132,142 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
         toast.show();
 
 
-        // tämän voi varmaan siirtää omaan activityyn, ettei ohjelma jää odottamaan...
-
+        // We define final (unique) list that holds Uris from files we are going to attach to email.
         final ArrayList<Uri> attachmentUris = new ArrayList<>();
 
 
+        // get firebase storage instance
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
 
-        // createTempFile(String prefix, String suffix)
-        //    Creates an empty file in the default temporary-file directory, using the given prefix and suffix to generate its name.
-
-
-        // store asynchronous tasks
+        // define list that store asynchronous tasks
         List<Task> tasks = new ArrayList<>();
 
-        // store photofiles
+        // define final (unique) list that stores photo files
         final ArrayList<File> photoFiles = new ArrayList<>();
 
-        // loop every photolist item and download picture to file
-        for (int i=0; i<mPhotoListItems.size(); i++) {
-        Log.i(TAG, "inside for loop run:"+Integer.toString(i+1)+"/"+Integer.toString(mPhotoListItems.size()));
+
+        // **** loop every photolist item and download picture to file ***
+        // ***********
+        for (int i = 0; i < mPhotoListItems.size(); i++) {
+            Log.i(TAG, "inside for loop run:" + Integer.toString(i + 1) + "/" + Integer.toString(mPhotoListItems.size()));
 
 
-                // Create a storage reference from our app
-                StorageReference storageRef = storage.getReference();
+            // Create a storage reference from our app
+            StorageReference storageRef = storage.getReference();
 
-                // Create a reference with an initial file path and name
-                StorageReference photoPathReference = storageRef.child("images/" + mPhotoListItems.get(i).getPictureFileName());
+            // Create a reference that points to firebase storage file that holds photo to be downloaded...
+            StorageReference photoPathReference = storageRef.child("images/" + mPhotoListItems.get(i).getPictureFileName());
 
+
+            // Create new file to hold photo on device
             File tempFile = null;
+
 
             try {
                 Log.i(TAG, "Created tempFile");
-               tempFile = createImageFile();
+
+                // call method that returns new file
+                tempFile = createImageFile();
 
             } catch (Exception e) {
                 Log.e(TAG, " Error on createTempFile!!");
+                // Terminate if we cant get new file
                 break;
             }
 
-                Task task = photoPathReference.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                  public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+            // get a task instance that runs asynchonously (separately)
+            // this task runs separately from this "main program"
+            Task task = photoPathReference.getFile(tempFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    //this runs when this separately run task finishes succesfully
+                    Log.i(TAG, "file download success!");
 
-                        Log.i(TAG, "file download success!");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    //these runs if this separately run task fails
+                    Log.i(TAG, "Task failed to donwload file and add uri to attachmentUris...");
 
+                    // show toast
+                    Toast toast = Toast.makeText(ShowPhotosOfDelivery.this, "Virhe ladattaessa kuvaa", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            });
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                       Log.i(TAG, "Task failed to donwload file and add uri to attachmentUris...");
+            // add this task to list that holds all download task
+            tasks.add(task);
 
-                        // show toast
-                        Toast toast = Toast.makeText(ShowPhotosOfDelivery.this, "Virhe ladattaessa kuvaa", Toast.LENGTH_SHORT);
-                        toast.show();
-
-
-                    }
-                });
-
-
-                photoFiles.add(tempFile);
-                tasks.add(task);
-
+            // add file information list
+            photoFiles.add(tempFile);
 
         }
 
+        // *** loop ends (get download task for one photo)
+        // ***
 
-        Log.i(TAG, "onko meillä taskeja???:");
+        // Print information about tasks to console
+        Log.i(TAG, "Do we have tasks???:");
         Log.i(TAG, "tasks: " + tasks.toString());
 
-try {
-    //sleep(5000);
-    allTask = Tasks.whenAll((List) tasks);
 
-    allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-        @Override
-        public void onSuccess(Void aVoid) {
+        try { // --- do after all files are downloaded from firebase storage
 
-            for(File file : photoFiles){
-                attachmentUris.add(getUriForFile(ShowPhotosOfDelivery.this, "fi.raumankonepaja.deliverylogger.fileprovider", file));
-            }
+            //get helper that holds information of all tasks
+            allTask = Tasks.whenAll((List) tasks);
 
-            Log.i(TAG, "Uris when all success:");
+            //run this after all file download tasks are finished
+            allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                    // get Uris from downloaded files
+                    for (File file : photoFiles) {
+                        attachmentUris.add(getUriForFile(ShowPhotosOfDelivery.this, "fi.raumankonepaja.deliverylogger.fileprovider", file));
+                    }
+
+                    // print to console about uris
+                    Log.i(TAG, "Uris when all success:");
+                    Log.i(TAG, attachmentUris.toString());
+
+                    // now we have URI's of photos on attachemntUris ArrayList..
+
+                    // launch email intent
+                    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                    intent.setType("*/*");
+                    intent.putExtra(Intent.EXTRA_EMAIL, "");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Läheteluettelon " + Integer.toString(mDeliveryNumber) + " kuvat");
+                    intent.putExtra(Intent.EXTRA_STREAM, attachmentUris);
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+
+                    }
+
+
+                }
+            });
+            allTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                    // apologize profusely to the user!
+                    Log.e(TAG, " ERROR ON ALL TASKS!");
+
+                    // show toast
+                    Toast toast = Toast.makeText(ShowPhotosOfDelivery.this, "Virhe ladattaessa kuvia!", Toast.LENGTH_SHORT);
+                    toast.show();
+
+                }
+            });
+
             Log.i(TAG, attachmentUris.toString());
-
-            // now we have URI's of photos on attachemntUris ArrayList..
-
-            // launch email intent
-            Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-            intent.setType("*/*");
-            intent.putExtra(Intent.EXTRA_EMAIL, "");
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Läheteluettelon "+Integer.toString(mDeliveryNumber)+" kuvat");
-            //   intent.setType("image/jpeg");
-            intent.putExtra(Intent.EXTRA_STREAM, attachmentUris);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-
-            }
-
-
+        } catch (Exception e) {
+            Log.e(TAG, "TASKS ALL WAIT CRASH");
         }
-    });
-    allTask.addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-            // apologize profusely to the user!
-            Log.e(TAG, " ERROR ON ALL TASKS!");
-
-            // show toast
-            Toast toast = Toast.makeText(ShowPhotosOfDelivery.this, "Virhe ladattaessa kuvia!", Toast.LENGTH_SHORT);
-            toast.show();
-
-        }
-    });
-
-    Log.i(TAG, attachmentUris.toString());
-}catch (Exception e ){
-    Log.e(TAG, "TASKS ALL WAIT CRASH");
-}
-
 
     }
-
 
 
     // this method creates and returns new imagefile

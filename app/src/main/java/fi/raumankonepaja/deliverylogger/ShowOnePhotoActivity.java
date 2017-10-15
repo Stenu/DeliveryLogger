@@ -28,11 +28,12 @@ public class ShowOnePhotoActivity extends AppCompatActivity {
         final ImageView mShowOnePhotoImageView = (ImageView) findViewById(R.id.ShowOnePhotoImageView);
 
 
-        // add photo info
-        mShowOnePhotoTextView.setText("Lähetenumero "+Integer.toString(mDeliveryNumber)+" pos "+Integer.toString(mPosition));
+        // add photo info to textview
+        mShowOnePhotoTextView.setText("Lähete numero: "+Integer.toString(mDeliveryNumber)+" pos "+Integer.toString(mPosition));
 
 
-        // tässä pitää hakea kuva firebasesta
+        // --- get photo from firebase ---
+
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         // Create a storage reference from our app
