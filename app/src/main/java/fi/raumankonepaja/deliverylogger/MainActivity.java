@@ -2,10 +2,14 @@ package fi.raumankonepaja.deliverylogger;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.io.File;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -58,22 +62,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        File photoDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
+        boolean success = MyHelper.deleteDirectory(photoDirectory);
 
+        if (success) {
+            Log.i(TAG, "Files deleted!");
+        } else {
+            Log.i(TAG, "Error on files deletion");
+        }
 
-     try {
-
-         // todo 1 delete photos from phone after app is closed
-//           if (getExternalFilesDir(DIRECTORY_PICTURES) != null) {
-//               Log.i(TAG, "Deleting files!:  "+ getFilesDir() +"/"+Environment.DIRECTORY_PICTURES);
-//          //     FileUtils.cleanDirectory(getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-//               FileUtils.deleteDirectory(new File(getFilesDir() +"/"+Environment.DIRECTORY_PICTURES));
-//          //     getFilesDir().deleteOnExit();
-//
-//           }
-
-       } catch (Exception e) {
-     }
 
 
     }

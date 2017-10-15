@@ -24,9 +24,8 @@ import java.util.List;
 public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adapter<ShowPhotosFromDeliveryRecyclerViewHolder> {
 
     private static final String TAG = "Recycler View Adapter";
-
-    private List<PhotoListItem> mPhotoListItems;
     protected Context mContext;
+    private List<PhotoListItem> mPhotoListItems;
 
     public ShowPhotosFromDeliveryRecyclerViewAdapter(Context mContext, List<PhotoListItem> mPhotoListItems) {
         this.mContext = mContext;
@@ -42,7 +41,7 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
         return viewHolder;
     }
     @Override
-    public void onBindViewHolder(final ShowPhotosFromDeliveryRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(final ShowPhotosFromDeliveryRecyclerViewHolder holder, final int position) {
 
        //print log
         Log.i(TAG, "Binding holder type 2------");
@@ -80,7 +79,11 @@ public class ShowPhotosFromDeliveryRecyclerViewAdapter extends RecyclerView.Adap
 
                 // After photo is downloaded -> put it to imageview on row
                 // todo 1 rotate image/view to correct position...
-                MyHelper.matcViewToPhotoOrientation(holder.mPhotoOnListImageView,bytes);
+                //   MyHelper.matcViewToPhotoOrientation(holder.mPhotoOnListImageView,bytes);
+
+                Log.i(TAG, "ROTATION :" + Integer.toString(mPhotoListItems.get(position).getRotation()));
+
+                holder.mPhotoOnListImageView.setRotation(mPhotoListItems.get(position).getRotation());
                 Bitmap photo = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
                 holder.mPhotoOnListImageView.setImageBitmap(photo);
 

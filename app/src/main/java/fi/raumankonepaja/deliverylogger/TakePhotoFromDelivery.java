@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,26 +44,24 @@ import java.util.List;
 
 public class TakePhotoFromDelivery extends AppCompatActivity {
 
+    // this method launches androids camera intent
+    static final int REQUEST_TAKE_PHOTO = 1;
     private static final String TAG = "TakePhotoFromDelivery";
     private static final String KEY_M_CURRENT_PHOTO_PATH = "mCurrentPhotoPath";
     private static final String KEY_M_LAST_CURRENT_PHOTO_PATH = "mLastCurrentPhotoPath";
-
     // introduce class variables
     Uri mPhotoURI;
     String mCurrentPhotoPath;
     String mLastCurrentPhotoPath;
-
     // introduce variables from layout components
     EditText mDeliveryNumber;
     EditText mDeliveryPosition;
     Button mTakePictureButton;
     Button mShowPhotosButton;
     ImageView mTakenPictureImageView;
-
     UploadTask mUploadTask; // firebase upload task (storage)
     List<ListItem> mListItems;
     List<String> avaimet;
-
     DatabaseReference databaseReference;
 
     @Override
@@ -134,8 +133,6 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
 
     }
-
-
 
     @Override
     protected void onResume() {
@@ -210,27 +207,6 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
     }
 
-    // text change listener class for hiding mTakePictureButton
-    private class TextChangeListener implements TextWatcher {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            showHideButton();
-        }
-    }
-
-
-
-
     // **** hides/shows mTakePictureButton
     private void showHideButton() {
 
@@ -287,9 +263,6 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         return image;
     }
 
-    // this method launches androids camera intent
-    static final int REQUEST_TAKE_PHOTO = 1;
-
     public void takePicture(View view) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -317,12 +290,9 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
         }
     }
 
-
-
-
-
     // this method uploads data to firebase (works but could be improved...)
     private void uploadDataToFirebase() {
+
 
         int deliveryInt = Integer.parseInt(mDeliveryNumber.getText().toString());
         int positionInt = Integer.parseInt(mDeliveryPosition.getText().toString());
@@ -342,7 +312,10 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
         // firebase database upload (data)
 
-        LogEntry logEntry = new LogEntry(deliveryInt, positionInt, pictureFileName, currentDateandTime);
+        // get orientation of photo
+        int rotation = MyHelper.photoOrientation(mCurrentPhotoPath);
+
+        LogEntry logEntry = new LogEntry(deliveryInt, positionInt, pictureFileName, currentDateandTime, rotation);
         databaseReference.push().setValue(logEntry);
 
         // firebase storage upload (photo - jpg)
@@ -371,10 +344,16 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
         mUploadTask = imageRef.putBytes(thumbnailData);
 
+        // show look photos button after upload
+        mUploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                showHideButton();
+            }
+        });
+
 
     }
-
-
 
     private void getAllDeliveries(DataSnapshot dataSnapshot) {
 
@@ -404,9 +383,27 @@ public class TakePhotoFromDelivery extends AppCompatActivity {
 
     public void showPhotos(View view) {
 
-        Intent intent = new Intent(view.getContext(), ShowPhotosOfDelivery.class);
+        Intent intent = new Intent(view.getContext(), ShowPhotosOfDeliveryActivity.class);
         intent.putExtra("EXTRA_DELIVERY_NUMBER", Integer.parseInt(mDeliveryNumber.getText().toString()));
         view.getContext().startActivity(intent);
+    }
+
+    // text change listener class for hiding mTakePictureButton
+    private class TextChangeListener implements TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            showHideButton();
+        }
     }
 
 

@@ -122,7 +122,7 @@ public class ListDeliveriesActivity extends AppCompatActivity {
         for (ListItem listItem : mListItems) {
             if (listItem.getDeliveryNumber() == deliveryNumber) {
                 sisaltaa = true;
-                Intent intent = new Intent(v.getContext(), ShowPhotosOfDelivery.class);
+                Intent intent = new Intent(v.getContext(), ShowPhotosOfDeliveryActivity.class);
                 intent.putExtra("EXTRA_DELIVERY_NUMBER", deliveryNumber);
                 v.getContext().startActivity(intent);
             }

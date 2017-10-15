@@ -34,20 +34,16 @@ import java.util.List;
 import static android.support.v4.content.FileProvider.getUriForFile;
 
 
-public class ShowPhotosOfDelivery extends AppCompatActivity {
+public class ShowPhotosOfDeliveryActivity extends AppCompatActivity {
 
-    private static final String TAG = "ShowPhotosOfDelivery";
+    private static final String TAG = "ShowPhotosOfDeliveryActivity";
+    TextView mShowPhotosFromDeliveryTextView;
+    int mDeliveryNumber;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private ShowPhotosFromDeliveryRecyclerViewAdapter recyclerViewAdapter;
-    TextView mShowPhotosFromDeliveryTextView;
     private DatabaseReference databaseReference;
-
     private ArrayList<PhotoListItem> mPhotoListItems;
-
-    int mDeliveryNumber;
-
-
     private Task<Void> allTask;
 
     @Override
@@ -90,7 +86,7 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
 
                 mPhotoListItems.add(photoListItem);
 
-                recyclerViewAdapter = new ShowPhotosFromDeliveryRecyclerViewAdapter(ShowPhotosOfDelivery.this, mPhotoListItems);
+                recyclerViewAdapter = new ShowPhotosFromDeliveryRecyclerViewAdapter(ShowPhotosOfDeliveryActivity.this, mPhotoListItems);
                 recyclerView.setAdapter(recyclerViewAdapter);
 
 
@@ -192,7 +188,7 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
                     Log.i(TAG, "Task failed to donwload file and add uri to attachmentUris...");
 
                     // show toast
-                    Toast toast = Toast.makeText(ShowPhotosOfDelivery.this, "Virhe ladattaessa kuvaa", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(ShowPhotosOfDeliveryActivity.this, "Virhe ladattaessa kuvaa", Toast.LENGTH_SHORT);
                     toast.show();
                 }
             });
@@ -225,7 +221,7 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
 
                     // get Uris from downloaded files
                     for (File file : photoFiles) {
-                        attachmentUris.add(getUriForFile(ShowPhotosOfDelivery.this, "fi.raumankonepaja.deliverylogger.fileprovider", file));
+                        attachmentUris.add(getUriForFile(ShowPhotosOfDeliveryActivity.this, "fi.raumankonepaja.deliverylogger.fileprovider", file));
                     }
 
                     // print to console about uris
@@ -256,7 +252,7 @@ public class ShowPhotosOfDelivery extends AppCompatActivity {
                     Log.e(TAG, " ERROR ON ALL TASKS!");
 
                     // show toast
-                    Toast toast = Toast.makeText(ShowPhotosOfDelivery.this, "Virhe ladattaessa kuvia!", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(ShowPhotosOfDeliveryActivity.this, "Virhe ladattaessa kuvia!", Toast.LENGTH_SHORT);
                     toast.show();
 
                 }

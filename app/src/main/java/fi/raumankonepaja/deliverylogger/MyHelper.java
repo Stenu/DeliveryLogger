@@ -13,6 +13,7 @@ import com.drew.metadata.exif.ExifIFD0Directory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 /**
  * Created by Sami on 15.10.2017.
@@ -20,12 +21,26 @@ import java.io.ByteArrayInputStream;
 
 public class MyHelper {
 
+
     private static String TAG = "MyHelper Class: ";
 
     // static method that can be run from not instantied MyHelper
     public static ImageView matchViewToPhotoOrientation(ImageView imageView, String photoFilePath) {
 
         // *** match orientation of photo and imageview
+
+
+        int rotation = photoOrientation(photoFilePath);
+
+        imageView.setRotation(rotation);
+
+        return imageView;
+    }
+
+    public static int photoOrientation(String photoFilePath) {
+
+        int rotation = 0;
+
         try {
             // print to console
             Log.i(TAG, "matching imageview to photo (ExifInterface");
@@ -33,7 +48,7 @@ public class MyHelper {
             ExifInterface exif = new ExifInterface(photoFilePath);
 
             int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-            int rotation = 0;
+
 
             if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
                 rotation = 90;
@@ -43,18 +58,12 @@ public class MyHelper {
                 rotation = 270;
             }
 
-            imageView.setRotation(rotation);
+            return rotation;
 
         } catch (Exception e) {
-            // print to console
-            Log.e(TAG, "exifInterface failed");
-            Log.e(TAG, e.toString());
-            if (photoFilePath != null) {
-                Log.e(TAG, "photo path :" + photoFilePath.toString());
-            }
+            Log.i(TAG, "Orientation solve failed");
+            return rotation;
         }
-
-        return imageView;
     }
 
 
@@ -113,5 +122,26 @@ public class MyHelper {
             return imageView;
         }
     }
+
+
+    // http://www.rgagnon.com/javadetails/java-0483.html
+
+    static public boolean deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+        }
+        return (path.delete());
+    }
+
+
+
+
 }
 

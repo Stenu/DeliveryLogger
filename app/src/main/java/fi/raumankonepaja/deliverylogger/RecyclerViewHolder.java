@@ -37,7 +37,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder{
 
                 int mDeliveryNumber = mListItems.get(getAdapterPosition()).getDeliveryNumber();
 
-                Intent intent = new Intent(v.getContext(),ShowPhotosOfDelivery.class);
+                Intent intent = new Intent(v.getContext(), ShowPhotosOfDeliveryActivity.class);
                 intent.putExtra("EXTRA_DELIVERY_NUMBER", mDeliveryNumber);
                 v.getContext().startActivity(intent);
 

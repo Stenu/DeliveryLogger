@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -18,6 +19,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText enteredEmailEditText;
     private EditText enteredPasswordEditText;
     private TextView userInfoTextView;
+    private Button loginButton;
+    private Button logoffButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +30,16 @@ public class LoginActivity extends AppCompatActivity {
         enteredEmailEditText = (EditText) findViewById(R.id.loginEmailEditText);
         enteredPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
         userInfoTextView = (TextView) findViewById(R.id.userNameTextView);
+        loginButton = (Button) findViewById(R.id.loginButton);
+        logoffButton = (Button) findViewById(R.id.logoffButton);
 
         mAuth = FirebaseAuth.getInstance();
 
         showHideUserInfo();
 
         // todo 3 do we need mAuth.onAuthStateChangedListener ?
+        // authentication is not working 100%
+        // user have to click 2 times login to get logged in
 
 
     }
@@ -85,9 +92,15 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             userInfoTextView.setText("");
+            loginButton.setText("Sign in");
             userInfoTextView.setVisibility(View.VISIBLE);
+            logoffButton.setVisibility(View.INVISIBLE);
+
+
         } else {
             userInfoTextView.setText("Logged in as " + currentUser.getEmail());
+            loginButton.setText("Continue");
+            logoffButton.setVisibility(View.VISIBLE);
 
         }
     }

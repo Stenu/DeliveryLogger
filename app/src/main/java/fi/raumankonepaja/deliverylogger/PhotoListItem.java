@@ -10,12 +10,14 @@ public class PhotoListItem {
     public int deliveryPos;
     public String pictureFileName;
     public String dateAndTime;
+    public int rotation;
 
-    public PhotoListItem(int deliveryNumber, int deliveryPos, String pictureFileName, String dateAndTime) {
+    public PhotoListItem(int deliveryNumber, int deliveryPos, String pictureFileName, String dateAndTime, int rotation) {
         this.deliveryNumber = deliveryNumber;
         this.deliveryPos = deliveryPos;
         this.pictureFileName = pictureFileName;
         this.dateAndTime = dateAndTime;
+        this.rotation = rotation;
     }
 
     public PhotoListItem() {
@@ -36,5 +38,9 @@ public class PhotoListItem {
 
     public String getDateAndTime() {
         return dateAndTime;
+    }
+
+    public int getRotation() {
+        return rotation;
     }
 }

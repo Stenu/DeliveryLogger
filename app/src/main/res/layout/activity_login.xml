@@ -12,54 +12,54 @@
 
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/linear"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true">
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    android:text="EMAIL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:text="EMAIL" />
 
                 <EditText
+                    android:id="@+id/loginEmailEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
+                    android:layout_weight="1"
                     android:ems="10"
-                    android:id="@+id/loginEmailEditText"
-                    android:layout_weight="1" />
+                    android:inputType="textEmailAddress" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    android:text="PASSWORD"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"
+                    android:text="PASSWORD" />
+
+                <EditText
+                    android:id="@+id/loginPasswordEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:ems="10"
-                    android:id="@+id/loginPasswordEditText" />
+                    android:inputType="textPassword" />
 
 
             </LinearLayout>
@@ -68,34 +68,34 @@
         </LinearLayout>
 
         <TextView
-            android:text="User Name"
+            android:id="@+id/userNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/userNameTextView" />
+            android:text="User Name" />
 
         <Button
-            android:text="Sign in"
+            android:id="@+id/loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/loginButton"
-            android:onClick="doLogin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_weight="1"
             android:background="@color/colorTriadig1"
             android:elevation="0dp"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:onClick="doLogin"
+            android:text="Sign in"
             />
 
         <Button
-            android:text="Sign out"
+            android:id="@+id/logoffButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/doLogoff"
-            android:onClick="doLogoff"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_weight="1"
             android:background="@color/colorTriadig2"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:onClick="doLogoff"
+            android:text="Sign out"
             />
     </LinearLayout>
 
